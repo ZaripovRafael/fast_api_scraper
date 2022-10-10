@@ -22,11 +22,12 @@ async def write_data(request: Request) -> dict:
     await mongo_client.record.insert_one(data)
     return {"Sucess": True}
 
-async def search(request: Request, search_data) -> dict:
+async def search(request: Request, search_data: str="Some text") -> dict:
     mongo_client = request.app.state.mongo_client["parse_db"]
-    cursor = mongo_client.records.find({search_data})
+    cursor = mongo_client.records.find({"document": search_data})
+
     res: list = []
-    for document in await cursor.to_list(length=100):
+    for document in await cursor.to_list(length=10):
         document["_id"] = str(document["_id"])
         res.append(document)
     return res
